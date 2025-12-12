@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registrar Avaliação</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /*
+       * ZECURE - PALETA DE CORES
+       * --blue: #3b82f6 (Azul principal)
+       * --green: #10b981 (Verde de sucesso/positivo)
+       * --red: #ef4444 (Vermelho de erro/negativo)
+       * --yellow: #fcd34d (Amarelo de alerta/config)
+       *
+       * Cores base para Light/Dark Mode
+       */
+      :root {
+        --bg: #f8f9fa; /* Fundo claro */
+        --text: #1f2937; /* Texto escuro */
+        --muted: #6b7280; /* Texto secundário */
+        --card-bg: #ffffff; /* Fundo do card claro */
+        --border: #e5e7eb; /* Borda clara */
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.08);
+        --green: #10b981;
+        --red: #ef4444;
+        --blue: #3b82f6;
+        --yellow: #fcd34d;
+      }
+      body.dark-mode {
+        --bg: #111827; /* Fundo escuro */
+        --text: #f3f4f6; /* Texto claro */
+        --muted: #9ca3af; /* Texto secundário escuro */
+        --card-bg: #1f2937; /* Fundo do card escuro */
+        --border: #374151; /* Borda escura */
+      }
+
+      /*
+       * HERO SECTION - IMAGEM DE FUNDO
+       *
+       * Para adicionar sua imagem de fundo:
+       * 1. Substitua 'ARNFundo.jpg' pelo caminho da sua imagem (local ou URL).
+       * 2. Ajuste a opacidade do linear-gradient (0.7) para controlar o escurecimento da imagem.
+       *    Valores menores (ex: 0.5) deixam a imagem mais visível, valores maiores (ex: 0.9) a escurecem mais.
+       * 3. 'center/cover no-repeat fixed' garante que a imagem cubra todo o fundo, centralizada e fixa.
+       */
+      body {
+        background: linear-gradient(
+            135deg,
+            rgba(59, 130, 246, 0.7),
+            rgba(16, 185, 129, 0.7)
+          ),
+          url("ARNFundo.jpg") center/cover no-repeat fixed;
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .navbar {
+        background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%);
+        box-shadow: var(--shadow);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+      }
+      .navbar-brand img {
+        height: 28px; /* Tamanho do logo */
+        margin-right: 8px;
+      }
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+      .card-header {
+        background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%);
+        color: white;
+        border-radius: 12px 12px 0 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 1rem; /* Ajuste para mobile */
+      }
+      .card-section-header {
+        background-color: var(--border);
+        color: var(--text);
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      body.dark-mode .card-section-header {
+        background-color: var(--border);
+        color: var(--text);
+      }
+      .btn-primary {
+        background: var(--blue);
+        border: none;
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
+      }
+      .btn-success {
+        background: var(--green);
+        border: none;
+      }
+      .btn-success:hover {
+        background: #059669;
+      }
+      .form-control,
+      .form-select {
+        background: var(--card-bg);
+        color: var(--text);
+        border-color: var(--border);
+      }
+      .form-control:focus,
+      .form-select:focus {
+        background: var(--card-bg);
+        color: var(--text);
+        border-color: var(--blue);
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+      }
+      .preview-desconto {
+        font-weight: 600;
+        margin-top: 8px;
+        padding: 12px;
+        border-radius: 6px;
+      }
+      .preview-negativo {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .preview-positivo {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .preview-neutro {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      body.dark-mode .preview-negativo {
+        background: #450a0a;
+        color: #fca5a5;
+      }
+      body.dark-mode .preview-positivo {
+        background: #064e3b;
+        color: #a7f3d0;
+      }
+      body.dark-mode .preview-neutro {
+        background: #374151;
+        color: #d1d5db;
+      }
+      .config-panel {
+        background: var(--yellow); /* Cor de alerta para o painel de config */
+        border: 1px solid #fcd34d;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+      .config-panel.hidden {
+        display: none;
+      }
+      .main-content {
+        flex: 1;
+      }
+      .footer {
+        background: var(--card-bg);
+        border-top: 1px solid var(--border);
+        padding: 16px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 32px;
+      }
+      .footer strong {
+        color: var(--text);
+      }
+
+      /* Otimizações para Mobile */
+      @media (max-width: 768px) {
+        .navbar-brand {
+          font-size: 1rem;
+        }
+        .navbar-brand img {
+          height: 24px;
+        }
+        .card-body {
+          padding: 1rem;
+        }
+        .btn {
+          font-size: 0.9rem;
+          padding: 0.6rem 1rem;
+        }
+        .btn-lg {
+          padding: 0.8rem 1.2rem;
+        }
+        .form-label {
+          font-size: 0.9rem;
+        }
+        .form-control,
+        .form-select {
+          font-size: 0.9rem;
+          padding: 0.6rem 0.75rem;
+        }
+        .card-section-header {
+          font-size: 1rem;
+          padding: 10px 12px;
+        }
+        .footer {
+          font-size: 0.85rem;
+          padding: 12px;
+        }
+        .d-flex.gap-3.flex-wrap {
+          flex-direction: column;
+          gap: 0.5rem !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container-fluid px-3">
+        <span class="navbar-brand"
+          ><img
+            src="ARN.png"
+            alt="Associação Residencial Nascentes"
+            class="me-2"
+            style="height: 24px"
+          />
+          Cliente</span
+        >
+        <div class="d-flex gap-2">
+          <button id="btnToggleDark" class="btn btn-light btn-sm">🌙</button>
+          <button id="btnConfig" class="btn btn-light btn-sm">⚙️</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Config Panel -->
+    <div id="configPanel" class="config-panel hidden">
+      <div class="container-fluid px-3">
+        <div class="row align-items-end g-2">
+          <div class="col-12 col-md-8">
+            <label class="form-label small mb-1"
+              >URL do WebApp (Google Apps Script)</label
+            >
+            <input
+              id="webappUrl"
+              class="form-control form-control-sm"
+              placeholder="Cole a URL do seu WebApp aqui"
+            />
+          </div>
+          <div class="col-12 col-md-4">
+            <button id="btnSaveConfig" class="btn btn-dark btn-sm w-100">
+              Salvar
+            </button>
+          </div>
+        </div>
+        <div id="configMsg" class="mt-2 small"></div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="container-fluid py-3 px-3">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-8 col-lg-6">
+            <div class="card">
+              <div class="card-header">📋 Registrar Nova Avaliação</div>
+              <div class="card-body">
+                <form id="formAvaliacao">
+                  <!-- SEÇÃO: DADOS PESSOAIS -->
+                  <div class="card-section-header">👤 Dados Pessoais</div>
+                  <!-- Avaliador -->
+                  <div class="mb-3">
+                    <label class="form-label">Avaliador</label>
+                    <select id="avaliadorSelect" class="form-select" required>
+                      <option value="">Selecione...</option>
+                      <option>Igor Felisberto</option>
+                      <option>Jefferson Ferreira</option>
+                      <option>Henrique Tadeu</option>
+                      <option>Jefferson Delfino</option>
+                      <option>Gustavo Marinho</option>
+                      <option value="outro">Outro (digitar nome)</option>
+                    </select>
+                  </div>
+                  <!-- Campo para "Outro Avaliador" -->
+                  <div
+                    id="outroAvaliadorContainer"
+                    class="mb-3"
+                    style="display: none"
+                  >
+                    <label class="form-label">Nome do Avaliador</label>
+                    <input
+                      type="text"
+                      id="outroAvaliador"
+                      class="form-control"
+                      placeholder="Digite o nome do avaliador"
+                    />
+                  </div>
+
+                  <!-- Data -->
+                  <div class="mb-4">
+                    <label class="form-label">Data da Ocorrência</label>
+                    <input
+                      type="date"
+                      id="dataOcorrencia"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <!-- SEÇÃO: OPERACIONAL -->
+                  <div class="card-section-header">
+                    ⚙️ Detalhes Operacionais
+                  </div>
+                  <!-- Plantão e Colaborador -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label">Plantão</label>
+                      <select id="plantao" class="form-select" required>
+                        <option value="">Selecione...</option>
+                        <option value="alfa">Alfa</option>
+                        <option value="bravo">Bravo</option>
+                        <option value="charlie">Charlie</option>
+                        <option value="delta">Delta</option>
+                      </select>
+                    </div>
+                    <div class="col-12 col-sm-6">
+                      <label class="form-label">Colaborador</label>
+                      <select id="colaborador" class="form-select" required>
+                        <option value="">Selecione plantão...</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Setor -->
+                  <div class="mb-4">
+                    <label class="form-label">Setor Empenhado</label>
+                    <select id="setor" class="form-select" required>
+                      <option value="">Selecione...</option>
+                      <option>Portaria</option>
+                      <option>Correspondência</option>
+                      <option>Área de Lazer</option>
+                      <option>Moto Ronda</option>
+                      <option>Portaria de Serviço</option>
+                      <option>CFTV</option>
+                    </select>
+                  </div>
+
+                  <!-- SEÇÃO: AVALIAÇÃO -->
+                  <div class="card-section-header">
+                    📝 Avaliação da Ocorrência
+                  </div>
+                  <!-- Tipo de Observação -->
+                  <div class="mb-3">
+                    <label class="form-label">Tipo de Observação</label>
+                    <div class="d-flex gap-3 flex-wrap">
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="tipo"
+                          value="Positiva"
+                          id="tipoPositiva"
+                          required
+                        />
+                        <label class="form-check-label" for="tipoPositiva"
+                          >✅ Positiva</label
+                        >
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="tipo"
+                          value="Negativa"
+                          id="tipoNegativa"
+                        />
+                        <label class="form-check-label" for="tipoNegativa"
+                          >❌ Negativa</label
+                        >
+                      </div>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="tipo"
+                          value="Neutra"
+                          id="tipoNeutra"
+                        />
+                        <label class="form-check-label" for="tipoNeutra"
+                          >⚪ Neutra</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Critério (AGORA É UM SELECT SUSPENSO) -->
+                  <div class="mb-3">
+                    <label class="form-label">Critério</label>
+                    <select id="criterio" class="form-select" required>
+                      <option value="">Selecione um critério...</option>
+                      <optgroup label="Critérios Negativos">
+                        <option value="Atestado sem justificativa">
+                          Atestado sem justificativa (-10 pts)
+                        </option>
+                        <option value="Falta injustificada">
+                          Falta injustificada (-20 pts)
+                        </option>
+                        <option value="Insubordinação">
+                          Insubordinação (-30 pts)
+                        </option>
+                        <option value="Atraso">Atraso (-5 pts)</option>
+                        <option value="Uniforme inadequado">
+                          Uniforme inadequado (-15 pts)
+                        </option>
+                        <option value="Falta de atenção">
+                          Falta de atenção (-25 pts)
+                        </option>
+                        <option value="Desrespeito">
+                          Desrespeito (-20 pts)
+                        </option>
+                        <option value="Protocolo não seguido">
+                          Protocolo não seguido (-20 pts)
+                        </option>
+                        <option value="Apresentação pessoal ruim">
+                          Apresentação pessoal ruim (-10 pts)
+                        </option>
+                      </optgroup>
+                      <optgroup label="Critérios Neutros">
+                        <option value="Outros">Outros (0 pts)</option>
+                      </optgroup>
+                      <optgroup label="Critérios Positivos">
+                        <option value="Destreza em serviço">
+                          Destreza em serviço
+                        </option>
+                        <option value="Desempenho excepcional">
+                          Desempenho excepcional
+                        </option>
+                        <option value="Iniciativa">Iniciativa</option>
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  <!-- Preview Desconto -->
+                  <div
+                    id="previewDesconto"
+                    class="preview-desconto"
+                    style="display: none"
+                  ></div>
+                  <input type="hidden" id="pontosDesconto" value="0" />
+
+                  <!-- Descrição -->
+                  <div class="mb-4">
+                    <label class="form-label">Descrição / Observações</label>
+                    <textarea
+                      id="descricao"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Descreva a ocorrência..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Mensagem -->
+                  <div id="msgAvaliacao" class="mb-3"></div>
+
+                  <!-- Botão Submit -->
+                  <button type="submit" class="btn btn-success btn-lg w-100">
+                    ✅ Registrar Avaliação
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer com Assinatura -->
+    <footer class="footer">
+      <strong>Desenvolvido por Edson Garcia</strong> - Área de Segurança
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // ===== CONFIG =====
+      // Substitua esta URL pela URL do seu WebApp do Google Apps Script
+      const WEBAPP_URL_DEFAULT =
+        "https://script.google.com/macros/s/AKfycbwuN83g7ZAszAOGN4xbkRrms9fudm9NwoUaCA83sX3xjCgiLuUyPWBVPtyPBUnPKqze/exec";
+      let WEBAPP_URL = localStorage.getItem("WEBAPP_URL") || WEBAPP_URL_DEFAULT;
+
+      // ===== MAPEAMENTO DE CRITÉRIOS E DESCONTOS (COMPLETO) =====
+      const criteriosDescontos = {
+        "Atestado sem justificativa": -10,
+        "Falta injustificada": -20,
+        Insubordinação: -30,
+        Atraso: -5,
+        "Uniforme inadequado": -15,
+        "Falta de atenção": -25,
+        Desrespeito: -20,
+        "Protocolo não seguido": -20,
+        "Apresentação pessoal ruim": -10,
+        "Destreza em serviço": 0,
+        "Desempenho excepcional": 0,
+        Iniciativa: 0,
+        Outros: 0,
+      };
+
+      // ===== DARK MODE =====
+      document.getElementById("btnToggleDark").addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem(
+          "darkMode",
+          document.body.classList.contains("dark-mode")
+        );
+      });
+
+      if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+      }
+
+      // ===== CONFIG PANEL =====
+      document.getElementById("btnConfig").addEventListener("click", () => {
+        const panel = document.getElementById("configPanel");
+        panel.classList.toggle("hidden");
+      });
+
+      document.getElementById("btnSaveConfig").addEventListener("click", () => {
+        const url = document.getElementById("webappUrl").value.trim();
+        if (url) {
+          WEBAPP_URL = url;
+          localStorage.setItem("WEBAPP_URL", url);
+          document.getElementById("configMsg").innerHTML =
+            '<div class="alert alert-success alert-sm mb-0">✓ Configuração salva!</div>';
+          setTimeout(() => {
+            document.getElementById("configMsg").innerHTML = "";
+          }, 2000);
+        }
+      });
+
+      document.getElementById("webappUrl").value = WEBAPP_URL;
+
+      // ===== SET DATA ATUAL =====
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("dataOcorrencia").value = today;
+
+      // ===== LÓGICA PARA "OUTRO AVALIADOR" =====
+      const avaliadorSelect = document.getElementById("avaliadorSelect");
+      const outroAvaliadorContainer = document.getElementById(
+        "outroAvaliadorContainer"
+      );
+      const outroAvaliadorInput = document.getElementById("outroAvaliador");
+
+      avaliadorSelect.addEventListener("change", () => {
+        if (avaliadorSelect.value === "outro") {
+          outroAvaliadorContainer.style.display = "block";
+          outroAvaliadorInput.setAttribute("required", "true");
+        } else {
+          outroAvaliadorContainer.style.display = "none";
+          outroAvaliadorInput.removeAttribute("required");
+          outroAvaliadorInput.value = ""; // Limpa o campo ao esconder
+        }
+      });
+
+      // ===== PREVIEW DESCONTO (AGORA PARA O SELECT DE CRITÉRIOS) =====
+      document
+        .getElementById("criterio")
+        .addEventListener("change", function () {
+          const criterio = this.value;
+          const desconto = criteriosDescontos[criterio] || 0;
+          const preview = document.getElementById("previewDesconto");
+          const input = document.getElementById("pontosDesconto");
+
+          input.value = desconto;
+
+          if (desconto < 0) {
+            preview.className = "preview-desconto preview-negativo";
+            preview.innerHTML = `❌ Desconto: <strong>${desconto} pontos</strong>`;
+          } else if (desconto > 0) {
+            preview.className = "preview-desconto preview-positivo";
+            preview.innerHTML = `✅ Bônus: <strong>+${desconto} pontos</strong>`;
+          } else {
+            preview.className = "preview-desconto preview-neutro";
+            preview.innerHTML = `⚪ Sem impacto`;
+          }
+
+          preview.style.display = "block";
+        });
+
+      // ===== LOAD COLABORADORES POR PLANTÃO =====
+      document
+        .getElementById("plantao")
+        .addEventListener("change", async function () {
+          const plantao = this.value;
+          const select = document.getElementById("colaborador");
+          select.innerHTML = '<option value="">Carregando...</option>';
+
+          if (!plantao) {
+            select.innerHTML = '<option value="">Selecione plantão...</option>';
+            return;
+          }
+
+          try {
+            const res = await fetch(WEBAPP_URL + "?action=listColaboradores");
+            const data = await res.json();
+
+            select.innerHTML = '<option value="">Selecione...</option>';
+
+            if (data.ok) {
+              data.colaboradores
+                .filter((c) => c.plantao === plantao)
+                .forEach((c) => {
+                  const opt = document.createElement("option");
+                  opt.value = c.nome;
+                  opt.textContent = `${c.nome} (${c.pontos} pts)`;
+                  select.appendChild(opt);
+                });
+            } else {
+              select.innerHTML = `<option value="">Erro: ${data.error}</option>`;
+            }
+          } catch (error) {
+            console.error("Erro ao carregar colaboradores:", error);
+            select.innerHTML = '<option value="">Erro ao carregar</option>';
+          }
+        });
+
+      // ===== SUBMIT AVALIAÇÃO =====
+      document
+        .getElementById("formAvaliacao")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const tipo = document.querySelector('input[name="tipo"]:checked');
+          const criterioSelect = document.getElementById("criterio");
+
+          if (!tipo) {
+            document.getElementById("msgAvaliacao").innerHTML =
+              '<div class="alert alert-warning">Selecione o tipo de observação</div>';
+            return;
+          }
+
+          if (!criterioSelect.value) {
+            document.getElementById("msgAvaliacao").innerHTML =
+              '<div class="alert alert-warning">Selecione um critério</div>';
+            return;
+          }
+
+          // Determina o nome do avaliador
+          let encarregadoNome;
+          if (avaliadorSelect.value === "outro") {
+            encarregadoNome = outroAvaliadorInput.value.trim();
+            if (!encarregadoNome) {
+              document.getElementById("msgAvaliacao").innerHTML =
+                '<div class="alert alert-warning">Digite o nome do avaliador</div>';
+              return;
+            }
+          } else {
+            encarregadoNome = avaliadorSelect.value;
+          }
+
+          const formData = new FormData();
+          formData.append("action", "submit");
+          formData.append(
+            "data",
+            document.getElementById("dataOcorrencia").value
+          );
+          formData.append(
+            "colaborador",
+            document.getElementById("colaborador").value
+          );
+          formData.append("plantao", document.getElementById("plantao").value);
+          formData.append("encarregado", encarregadoNome); // Usa o nome determinado
+          formData.append("tipo", tipo.value);
+          formData.append("criterio", criterioSelect.value);
+          formData.append("setor", document.getElementById("setor").value);
+          formData.append(
+            "pontos_desconto",
+            document.getElementById("pontosDesconto").value
+          );
+          formData.append(
+            "descricao",
+            document.getElementById("descricao").value
+          );
+
+          try {
+            const res = await fetch(WEBAPP_URL, {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+
+            if (data.ok) {
+              document.getElementById("msgAvaliacao").innerHTML =
+                '<div class="alert alert-success">✅ Avaliação registrada com sucesso!</div>';
+              this.reset();
+              document.getElementById("previewDesconto").style.display = "none";
+              // Resetar o select de critério e colaboradores
+              document.getElementById("criterio").value = "";
+              document.getElementById("colaborador").innerHTML =
+                '<option value="">Selecione plantão...</option>';
+              // Resetar avaliador
+              avaliadorSelect.value = "";
+              outroAvaliadorContainer.style.display = "none";
+              outroAvaliadorInput.removeAttribute("required");
+              outroAvaliadorInput.value = "";
+              setTimeout(() => {
+                document.getElementById("msgAvaliacao").innerHTML = "";
+              }, 2000);
+            } else {
+              document.getElementById(
+                "msgAvaliacao"
+              ).innerHTML = `<div class="alert alert-danger">❌ Erro: ${data.error}</div>`;
+            }
+          } catch (error) {
+            console.error("Erro ao enviar avaliação:", error);
+            document.getElementById(
+              "msgAvaliacao"
+            ).innerHTML = `<div class="alert alert-danger">❌ Erro de conexão: ${error.message}</div>`;
+          }
+        });
+    </script>
+  </body>
+</html>
